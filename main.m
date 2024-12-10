@@ -58,10 +58,12 @@ moderate_actLvl_coeff = 0.273;
 intense_actLvl_coeff = 0.22;
 step_coeff = 0.48;
 
-time_no_actLvl = sum(activityLevel == 0) / 60; % in minutes
-time_low_actLvl = sum(activityLevel == 1) / 60; % in minutes
-time_moderate_actLvl = sum(activityLevel == 2) / 60; % in minutes
-time_intense_actLvl = sum(activityLevel == 3) / 60; % in minutes
+totalDataPoints = length(activityLevel);
+time_no_actLvl = sum(activityLevel == 0) / totalDataPoints * totalTimeSeconds / 60; % in percentage
+time_low_actLvl = sum(activityLevel == 1) / totalDataPoints * totalTimeSeconds / 60; % in percentage
+time_moderate_actLvl = sum(activityLevel == 2) / totalDataPoints * totalTimeSeconds / 60; % in percentage
+time_intense_actLvl = sum(activityLevel == 3) / totalDataPoints * totalTimeSeconds / 60; % in percentage
+
 
 % Calculate calories burned
 calories = step_coeff*stepsTaken + low_actLvl_coeff*time_low_actLvl + moderate_actLvl_coeff*time_moderate_actLvl + intense_actLvl_coeff*time_intense_actLvl;
