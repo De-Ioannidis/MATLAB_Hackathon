@@ -8,6 +8,6 @@ Then, we collected real world data using MATLAB Mobile. This data was used to tr
 
 The data was parsed, and we performed feature engineering. We observed that the most descriptive features for the exercise intensity were the magnitude of the acceleration data, the magnitude of gyroscope data, the GPS speed and the orientation data. We labeled the collected data and performed classification using MATLAB's Classification Learner (session stored in ClassificationLearnerSession.mat). We trained all available classification models and tested them on seperately collected test data. The best-performing model was a Efficient Linear SVM without PCA, which achieved an accuracy of 64.5%. 
 
-To count steps, the acceleration data is smoothed with a moving average filter to cut down on noise. Then, peaks are detected using findpeaks by setting some thresholds for height and distance between them. The total steps are just the number of peaks found. Also we can see the GPS route that we took in order to gather the data.
+To count steps, the acceleration data is smoothed with a moving average filter to cut down on noise. Then, peaks are detected using findpeaks by setting some thresholds for height and distance between them. The total steps are just the number of peaks found.
 
 In the end we merged our code parts into a main.m file that can predict calories based on real data we collected by walking / running with MATLAB Mobile.
