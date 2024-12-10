@@ -20,7 +20,13 @@ unifiedTime = linspace(0, max([accelTime(end), angVelTime(end), magFieldTime(end
 stepsTaken = calculateSteps(accelData.X, accelData.Y, accelData.Z);
 
 % Get distance and total time
-[distance, time] = calculateDistanceAndTime(positionData);
+[distance, totalTimeSeconds] = calculateDistanceAndTime(positionData);
+
+% Convert total time to hours, minutes, and seconds
+totalHours = floor(totalTimeSeconds / 3600); % Whole hours
+remainingSeconds = mod(totalTimeSeconds, 3600); % Remaining seconds after hours
+totalMinutes = floor(remainingSeconds / 60); % Whole minutes
+finalSeconds = mod(remainingSeconds, 60); % Remaining seconds after minutes
 
 % Extract features for activity level model
 accelMagnitude = sqrt(accelData.X.^2 + accelData.Y.^2 + accelData.Z.^2);
@@ -45,22 +51,29 @@ featureTable = table(accelMagnitude, angVelMagnitude, speed, orientationX, orien
 trainedModel = load('activityLevel_trainedModel.mat'); 
 [yfit, ~] = trainedModel.trainedModel.predictFcn(featureTable);
 activityLevel = yfit;
-
+disp(size(activityLevel));
 % Coefficients for calories from neural network model
 low_actLvl_coeff = 0.602;
 moderate_actLvl_coeff = 0.273;
 intense_actLvl_coeff = 0.22;
 step_coeff = 0.48;
 
-% Calculate calories burned
-calories = step_coeff*stepsTaken + low_actLvl_coeff*sum(activityLevel == 1) + moderate_actLvl_coeff*sum(activityLevel == 2) + intense_actLvl_coeff*sum(activityLevel == 3);
+time_no_actLvl = sum(activityLevel == 0) / 60; % in minutes
+time_low_actLvl = sum(activityLevel == 1) / 60; % in minutes
+time_moderate_actLvl = sum(activityLevel == 2) / 60; % in minutes
+time_intense_actLvl = sum(activityLevel == 3) / 60; % in minutes
 
-disp('Time Elapsed: ')
-disp(time);
-disp('Distance Travelled: ');
-disp(distance);
-disp('Calories burned:');
-disp(calories);
+% Calculate calories burned
+calories = step_coeff*stepsTaken + low_actLvl_coeff*time_low_actLvl + moderate_actLvl_coeff*time_moderate_actLvl + intense_actLvl_coeff*time_intense_actLvl;
+
+% Display results
+fprintf('Total distance travelled: %.2f km\n', distance);
+fprintf('Total time of activity: %d hours, %d minutes, and %.0f seconds\n', totalHours, totalMinutes, finalSeconds);
+fprintf('Time spent inactive: %.2f minutes\n', time_no_actLvl);
+fprintf('Time spent in light activity: %.2f minutes\n', time_low_actLvl);
+fprintf('Time spent in moderate activity: %.2f minutes\n', time_moderate_actLvl);
+fprintf('Time spent in intense activity: %.2f minutes\n', time_intense_actLvl);
+fprintf('Calories burned: %.2f\n', calories);
 
 figure('WindowState', 'maximized');
 plot(unifiedTime, yfit, 'r', 'LineWidth', 1.5);
@@ -70,4 +83,3 @@ title('Predicted Activity Level Over Time');
 yticks([0 1 2 3]);
 yticklabels({'No Activity', 'Light', 'Moderate', 'Intense'});
 grid on;
-
