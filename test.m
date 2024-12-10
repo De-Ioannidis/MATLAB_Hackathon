@@ -1,4 +1,0 @@
-disp('peos')
-
-
-disp("nigga ")
